@@ -1,0 +1,23 @@
+#include <libpq-fe.h>
+#include <stdio.h>
+#include "../include/app_context.h"
+
+#define CONN_STRING "user=postgres dbname=postgres password=rangoo123 host=localhost"
+
+int app_init(AppContext *app) {
+    app->db = PQconnectdb(CONN_STRING);
+
+    if(PQstatus(app->db) == CONNECTION_OK)
+        return 0;
+
+    fprintf(stderr, "Could not establish connection with database: %s\n", PQerrorMessage(app->db));
+    PQfinish(app->db);
+    return 1;
+}
+
+void app_shutdown(AppContext *app) {
+    if(app->db != NULL) {
+        PQfinish(app->db);
+        app->db = NULL;
+    }
+}
