@@ -1,8 +1,9 @@
-CC = gcc
-SRCDIR = src
-BUILDDIR = build
-OBJDIR = $(BUILDDIR)/obj
-DEPDIR = $(BUILDDIR)/dep
+CC := gcc
+SRCDIR := src
+INCDIR := include
+BUILDDIR := build
+OBJDIR := $(BUILDDIR)/obj
+DEPDIR := $(BUILDDIR)/dep
 
 SRC = $(shell find src -name "*.c")
 OBJ = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC))
@@ -10,25 +11,23 @@ DEP = $(patsubst $(SRCDIR)/%.c,$(DEPDIR)/%.d,$(SRC))
 
 PKG_LIBS = libulfius jansson liborcania libpq
 
-CFLAGS  += -Wall -Wextra $(shell pkg-config --cflags $(PKG_LIBS))
-LDLIBS  += $(shell pkg-config --libs $(PKG_LIBS))
+CFLAGS  = -Wall -Wextra -I$(INCDIR) $(shell pkg-config --cflags $(PKG_LIBS))
+LDLIBS  = $(shell pkg-config --libs $(PKG_LIBS))
 
-TARGET = my_api
+TARGET = playground_api
 
-all: $(BUILDDIR) $(OBJDIR) $(DEPDIR) $(TARGET)
-$(BUILDDIR):
+all: create_build_dirs $(BUILDDIR)/$(TARGET)
+
+create_build_dirs:
 	mkdir -p $(BUILDDIR)
-
-$(OBJDIR):
 	mkdir -p $(OBJDIR)
-
-$(DEPDIR):
 	mkdir -p $(DEPDIR)
 
-$(TARGET): $(OBJ)
-	$(CC) $(OBJ) -o $(BUILDDIR)/$@ $(LDLIBS)
+$(BUILDDIR)/$(TARGET): $(OBJ)
+	$(CC) $(OBJ) -o $@ $(LDLIBS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(dir $@) $(dir $(DEPDIR)/$*.d)
 	$(CC) $(CFLAGS) -MMD -MP -MF $(DEPDIR)/$*.d -c $< -o $@
 
 -include $(DEP)
