@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/user_entity.h"
+#include "user_entity.h"
 
 UserEntity map_query_to_entity(PGresult *result) {
     UserEntity user = {

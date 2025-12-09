@@ -1,6 +1,6 @@
 #include <jansson.h>
 #include <stdio.h>
-#include "../include/user_dto.h"
+#include "user_dto.h"
 
 #define OBJECT_STRING "{s:i,s:s,s:i}"
 

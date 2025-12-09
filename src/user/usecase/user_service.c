@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/app_context.h"
-#include "../include/user_repository.h"
-#include "../include/user_types.h"
+#include "app_context.h"
+#include "user_repository.h"
+#include "user_types.h"
 
-int get_users_service(AppContext *app, UserListDto *target) {
+int user_service_get_users(AppContext *app, UserListDto *target) {
     UserEntity *user_entity_list;
     int num_users = 0;
-    int status = get_users_entity(app, &user_entity_list, &num_users);
+    int status = user_repository_get_users(app, &user_entity_list, &num_users);
 
     UserDto *user_dto_list = malloc(num_users * sizeof(UserDto));
 
@@ -26,9 +26,9 @@ int get_users_service(AppContext *app, UserListDto *target) {
     return status;
 }
 
-int get_user_by_id_service(AppContext *app, UserDto *target, int id) {
+int user_service_get_user_by_id(AppContext *app, UserDto *target, int id) {
     UserEntity user_entity;
-    int status = get_user_entity_by_id(app, &user_entity, id);
+    int status = user_repository_get_user_by_id(app, &user_entity, id);
 
     if(status == 0) {
         target->id = user_entity.id;
@@ -39,32 +39,32 @@ int get_user_by_id_service(AppContext *app, UserDto *target, int id) {
     return status;
 }
 
-int create_user_service(AppContext *app, UserDto *user_dto) {
+int user_service_create_user(AppContext *app, UserDto *user_dto) {
     UserEntity user_entity = {
         .id = 0,
         .name = user_dto->name,
         .age = user_dto->age
     };
 
-    int status = create_user_entity(app, &user_entity);
+    int status = user_repository_create_user(app, &user_entity);
 
     return status;
 }
 
-int update_user_service(AppContext *app, UserDto *user_dto) {
+int user_service_update_user(AppContext *app, UserDto *user_dto) {
     UserEntity user_entity = {
         .id = user_dto->id,
         .name = user_dto->name,
         .age = user_dto->age
     };
 
-    int status = update_user_entity(app, &user_entity);
+    int status = user_repository_update_user(app, &user_entity);
 
     return status;
 }
 
-int delete_user_service(AppContext *app, int id) {
-    int status = delete_user_entity(app, id);
+int user_service_delete_user(AppContext *app, int id) {
+    int status = user_repository_delete_user(app, id);
     
     return status;
 }

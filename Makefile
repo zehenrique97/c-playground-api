@@ -11,7 +11,7 @@ DEP = $(patsubst $(SRCDIR)/%.c,$(DEPDIR)/%.d,$(SRC))
 
 PKG_LIBS = libulfius jansson liborcania libpq
 
-CFLAGS  = -Wall -Wextra -I$(INCDIR) $(shell pkg-config --cflags $(PKG_LIBS))
+CFLAGS  = -Wall -Wextra -I$(INCDIR) $(shell pkg-config --cflags $(PKG_LIBS)) -MMD -MP -MF
 LDLIBS  = $(shell pkg-config --libs $(PKG_LIBS))
 
 TARGET = playground_api
@@ -28,7 +28,7 @@ $(BUILDDIR)/$(TARGET): $(OBJ)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p $(dir $@) $(dir $(DEPDIR)/$*.d)
-	$(CC) $(CFLAGS) -MMD -MP -MF $(DEPDIR)/$*.d -c $< -o $@
+	$(CC) $(CFLAGS) $(DEPDIR)/$*.d -c $< -o $@
 
 -include $(DEP)
 
@@ -36,6 +36,6 @@ clean:
 	rm -rf $(BUILDDIR)
 
 run: $(BUILDDIR)/$(TARGET)
-	./$(BUILDDIR)/$(TARGET)
+	./$<
 
 .PHONY: all run clean

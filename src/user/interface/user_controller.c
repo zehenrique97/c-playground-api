@@ -1,16 +1,16 @@
 #include <stdlib.h>
 #include <ulfius.h>
 #include <jansson.h>
-#include "../include/app_context.h"
-#include "../include/user_controller.h"
-#include "../include/user_dto.h"
-#include "../include/user_service.h"
+#include "app_context.h"
+#include "user_controller.h"
+#include "user_dto.h"
+#include "user_service.h"
 
-int get_users(const struct _u_request *req, struct _u_response *res, void *user_data) {
+int user_controller_get_users(const struct _u_request *req, struct _u_response *res, void *user_data) {
     AppContext *app = (AppContext *) user_data;
     UserListDto user_list_dto;
 
-    int status = get_users_service(app, &user_list_dto);
+    int status = user_service_get_users(app, &user_list_dto);
 
     if(status == 1)
         ulfius_set_json_body_response(res, 500, NULL);
@@ -25,12 +25,12 @@ int get_users(const struct _u_request *req, struct _u_response *res, void *user_
     return U_CALLBACK_COMPLETE;
 }
 
-int get_user_by_id(const struct _u_request *req, struct _u_response *res, void *user_data) {
+int user_controller_get_user_by_id(const struct _u_request *req, struct _u_response *res, void *user_data) {
     AppContext *app = (AppContext *) user_data;
     UserDto user_dto;
 
     char *id = u_map_get(req->map_url, "id");
-    int status = get_user_by_id_service(app, &user_dto, atoi(id));
+    int status = user_service_get_user_by_id(app, &user_dto, atoi(id));
 
     if(status == 1)
         ulfius_set_json_body_response(res, 500, NULL);
@@ -45,7 +45,7 @@ int get_user_by_id(const struct _u_request *req, struct _u_response *res, void *
     return U_CALLBACK_COMPLETE;
 }
 
-int post_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
+int user_controller_post_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
     AppContext *app = (AppContext *) user_data;
 
     json_error_t json_error;
@@ -65,7 +65,7 @@ int post_user(const struct _u_request *req, struct _u_response *res, void *user_
         .age = age
     };
 
-    int status = create_user_service(app, &user_dto);
+    int status = user_service_create_user(app, &user_dto);
 
     json_decref(body);
 
@@ -77,7 +77,7 @@ int post_user(const struct _u_request *req, struct _u_response *res, void *user_
     return U_CALLBACK_COMPLETE;
 }
 
-int put_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
+int user_controller_put_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
     AppContext *app = (AppContext *) user_data;
 
     // TODO: Implementar uma função para a conversão de json body->DTO
@@ -97,7 +97,7 @@ int put_user(const struct _u_request *req, struct _u_response *res, void *user_d
         .age = age
     };
 
-    int status = update_user_service(app, &user_dto);
+    int status = user_service_update_user(app, &user_dto);
 
     // TODO: Mapear os status para um enum
     if(status == 1)
@@ -110,11 +110,11 @@ int put_user(const struct _u_request *req, struct _u_response *res, void *user_d
     return U_CALLBACK_COMPLETE;
 }
 
-int delete_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
+int user_controller_delete_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
     AppContext *app = (AppContext *) user_data;
     char *id = u_map_get(req->map_url, "id");
 
-    int status = delete_user_service(app, atoi(id));
+    int status = user_service_delete_user(app, atoi(id));
 
     if(status == 1)
         ulfius_set_json_body_response(res, 500, NULL);
