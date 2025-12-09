@@ -1,13 +1,23 @@
 #include <jansson.h>
-#include "user_types.h"
 
 #ifndef USER_DTO_H
 #define USER_DTO_H
 
-int map_user_json_to_dto(json_t *root, UserDto *dto);
+typedef struct {
+    int id;
+    char *name;
+    int age;
+} UserDto;
 
-int map_user_dto_to_json(UserDto *dto, json_t **target);
+typedef struct {
+    int number_of_users;
+    UserDto *user_dto_list;
+} UserListDto;
 
-int map_user_dto_to_json_array(UserListDto *dto, json_t **target);
+int json_to_user(json_t *root, UserDto *dto);
+
+int user_to_json(UserDto *dto, json_t **target);
+
+int user_list_to_json_array(UserListDto *dto, json_t **target);
 
 #endif

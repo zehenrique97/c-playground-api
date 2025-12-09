@@ -1,8 +1,8 @@
 #include <libpq-fe.h>
 #include <stdio.h>
-#include "../include/app_context.h"
+#include "app_context.h"
 
-#define CONN_STRING "user=postgres dbname=postgres password=rangoo123 host=localhost"
+#define CONN_STRING "user=teste dbname=testedb password=teste123 host=localhost"
 
 int app_init(AppContext *app) {
     app->db = PQconnectdb(CONN_STRING);

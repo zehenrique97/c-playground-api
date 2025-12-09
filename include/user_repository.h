@@ -4,10 +4,10 @@
 #ifndef USER_REPOSITORY_H
 #define USER_REPOSITORY_H
 
-int get_users_entity(AppContext *app, UserEntity **users, int *count);
-int get_user_entity_by_id(AppContext *app, UserEntity *target, int id);
-int create_user_entity(AppContext *app, UserEntity *user);
-int update_user_entity(AppContext *app, UserEntity *user);
-int delete_user_entity(AppContext *app, int id);
+int user_repository_get_users(AppContext *app, User **users, int *count);
+int user_repository_get_user_by_id(AppContext *app, User *target, int id);
+int user_repository_create_user(AppContext *app, User *user);
+int user_repository_update_user(AppContext *app, User *user);
+int user_repository_delete_user(AppContext *app, int id);
 
 #endif
