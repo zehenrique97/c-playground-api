@@ -1,10 +1,15 @@
-#include "user_types.h"
-
 #ifndef USER_ENTITY_H
 #define USER_ENTITY_H
 
-UserEntity *map_query_to_entity_array(PGresult *result);
+typedef struct {
+    int id;
+    char *name;
+    int age;
+} User;
 
-UserEntity map_query_to_entity(PGresult *result);
+User *user_create(void);
+void user_destroy(User *user);
+
+void query_to_user(User *user, PGresult *result, int row_number);
 
 #endif

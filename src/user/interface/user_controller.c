@@ -18,7 +18,7 @@ int user_controller_get_users(const struct _u_request *req, struct _u_response *
         ulfius_set_empty_body_response(res, 204);
     else {
         json_t *payload;
-        map_user_dto_to_json_array(&user_list_dto, &payload);
+        user_list_to_json_array(&user_list_dto, &payload);
         ulfius_set_json_body_response(res, 200, payload);
     }
 
@@ -38,7 +38,7 @@ int user_controller_get_user_by_id(const struct _u_request *req, struct _u_respo
         ulfius_set_empty_body_response(res, 204);
     else {
         json_t *payload;
-        map_user_dto_to_json(&user_dto, &payload);
+        user_to_json(&user_dto, &payload);
         ulfius_set_json_body_response(res, 200, payload);
     }
 
