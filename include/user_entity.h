@@ -3,13 +3,11 @@
 
 typedef struct {
     int id;
-    char *name;
+    char name[255];
     int age;
 } User;
 
 User *user_create(void);
 void user_destroy(User *user);
-
-void query_to_user(User *user, PGresult *result, int row_number);
 
 #endif

@@ -7,44 +7,49 @@
 
 int user_repository_get_users(AppContext *app, User **users, int *count) {
     PGresult *result = PQexec(app->db, "SELECT * FROM users;");
-    int num_rows = PQntuples(result);
-
-    *count = num_rows;
-
-    if(PQresultStatus(result) == PGRES_TUPLES_OK) {
-        if(num_rows == 0) {
-            PQclear(result);
-            return 2;
-        }
-
-        User *user_list = malloc(num_rows * sizeof(User));
-
-        for (int i = 0; i < num_rows; i++) {
-            User *user = user_create();
-
-            query_to_user(user, result, i);
-
-            user_list[i] = *user;
-        }
-
-        *users = user_list;
+    if(PQresultStatus(result) != PGRES_TUPLES_OK) {
         PQclear(result);
-        return 0;
+        return 1;
     }
+
+    int num_rows = PQntuples(result);
+    if(num_rows == 0) {
+        PQclear(result);
+        *users = NULL;
+        *count = 0;
+        return 2;
+    }
+
+    User *user_rows = malloc(num_rows * sizeof(User));
+    if(user_rows == NULL) {
+        PQclear(result);
+        return 1;
+    }
+
+    for (int i = 0; i < num_rows; i++) {
+        user_rows[i].id = atoi(PQgetvalue(result, i, 0));
+        strcpy(user_rows[i].name, PQgetvalue(result, i, 1));
+        user_rows[i].age = atoi(PQgetvalue(result, i, 2));
+    }
+
+    *users = user_rows;
+    *count = num_rows;
     PQclear(result);
-    return 1;
+    return 0;
 }
 
-int user_repository_get_user_by_id(AppContext *app, User *target, int id) {
+int user_repository_get_user_by_id(AppContext *app, User *user) {
     char buffer[255];
-    snprintf(buffer, sizeof(buffer), "SELECT * FROM users WHERE id=%d;", id);
+    snprintf(buffer, sizeof(buffer), "SELECT * FROM users WHERE id=%d;", user->id);
 
     PGresult *result = PQexec(app->db, buffer);
 
     if(PQresultStatus(result) == PGRES_TUPLES_OK) {
         if(PQntuples(result) == 0) return 2;
 
-        query_to_user(target, result, 0);
+        user->id = atoi(PQgetvalue(result, 0, 0));
+        strcpy(user->name, PQgetvalue(result, 0, 1));
+        user->age = atoi(PQgetvalue(result, 0, 2));
 
         return 0;
     }
