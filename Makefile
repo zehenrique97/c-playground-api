@@ -5,7 +5,7 @@ BUILDDIR := build
 OBJDIR := $(BUILDDIR)/obj
 DEPDIR := $(BUILDDIR)/dep
 
-INCLUDE_DIRS = $(shell find $(INCDIR) -type d)
+INCLUDE = $(shell find $(INCDIR) -type d)
 
 SRC = $(shell find src -name "*.c")
 OBJ = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC))
@@ -13,7 +13,7 @@ DEP = $(patsubst $(SRCDIR)/%.c,$(DEPDIR)/%.d,$(SRC))
 
 PKG_LIBS = libulfius jansson liborcania libpq
 
-CFLAGS  = -Wall -Wextra $(addprefix -I,$(INCLUDE_DIRS)) $(shell pkg-config --cflags $(PKG_LIBS)) -MMD -MP -MF
+CFLAGS  = -Wall -Wextra $(addprefix -I,$(INCLUDE)) $(shell pkg-config --cflags $(PKG_LIBS)) -MMD -MP -MF
 LDLIBS  = $(shell pkg-config --libs $(PKG_LIBS))
 
 TARGET = lab_api
