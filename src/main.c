@@ -1,14 +1,11 @@
 #include <stdio.h>
 #include <ulfius.h>
 #include <jansson.h>
-#include "user_controller.h"
+#include "user_controller_adapter.h"
 #include "app_context.h"
 
 #define PORT 8080
 #define PREFIX "/api/v1"
-
-// TODO: Implementar testes
-// TODO: Ajustar extensão do VS Code
 
 int main() {
     AppContext app;
@@ -21,11 +18,11 @@ int main() {
         fprintf(stderr, "Error while trying to start instance\n");
     }
 
-    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/users", 0, &user_controller_get_users, &app);
-    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/users/:id", 0, &user_controller_get_user_by_id, &app);
-    ulfius_add_endpoint_by_val(&instance, "POST", PREFIX, "/users", 0, &user_controller_post_user, &app);
-    ulfius_add_endpoint_by_val(&instance, "PUT", PREFIX, "/users", 0, &user_controller_put_user, &app);
-    ulfius_add_endpoint_by_val(&instance, "DELETE", PREFIX, "/users/:id", 0, &user_controller_delete_user, &app);
+    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/users", 0, &user_controller_adapter_get_users, &(app.get_users_port));
+    ulfius_add_endpoint_by_val(&instance, "GET", PREFIX, "/users/:id", 0, &user_controller_adapter_get_user_by_id, &(app.get_user_port_by_id));
+    ulfius_add_endpoint_by_val(&instance, "POST", PREFIX, "/users", 0, &user_controller_adapter_post_user, &(app.create_user_port));
+    ulfius_add_endpoint_by_val(&instance, "PUT", PREFIX, "/users", 0, &user_controller_adapter_put_user, &(app.update_user_port));
+    ulfius_add_endpoint_by_val(&instance, "DELETE", PREFIX, "/users/:id", 0, &user_controller_adapter_delete_user, &(app.delete_user_port));
 
     if(ulfius_start_framework(&instance) == U_OK) {
         printf("Server started successfully. Listening on port: %d\nPress Control+C to stop\n", PORT);

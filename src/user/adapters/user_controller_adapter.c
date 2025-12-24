@@ -2,21 +2,24 @@
 #include <ulfius.h>
 #include <jansson.h>
 #include <string.h>
-#include "app_context.h"
-#include "user_controller.h"
-#include "user_service.h"
-#include "user_entity.h"
+#include "user_controller_adapter.h"
+#include "user.h"
+#include "get_users_port.h"
+#include "get_user_by_id_port.h"
+#include "create_user_port.h"
+#include "update_user_port.h"
+#include "delete_user_port.h"
 
-int user_controller_get_users(const struct _u_request *req, struct _u_response *res, void *user_data) {
-    AppContext *app = (AppContext *) user_data;
-    User *user_list = NULL;
+int user_controller_adapter_get_users(const struct _u_request *req, struct _u_response *res, void *user_data) {
+    GetUsersPort *get_users_port = (GetUsersPort *) user_data;
+    User *user_list;
     int number_of_users = 0;
 
-    int status = user_service_get_users(app, &user_list, &number_of_users);
+    int rc = get_users_port->handle(get_users_port->ctx, &user_list, &number_of_users);
 
-    if(status == 1)
+    if(rc == 1)
         ulfius_set_json_body_response(res, 500, NULL);
-    else if(status == 2)
+    else if(rc == 2)
         ulfius_set_empty_body_response(res, 204);
     else {
         json_t *root = json_object();
@@ -38,30 +41,30 @@ int user_controller_get_users(const struct _u_request *req, struct _u_response *
     return U_CALLBACK_COMPLETE;
 }
 
-int user_controller_get_user_by_id(const struct _u_request *req, struct _u_response *res, void *user_data) {
-    AppContext *app = (AppContext *) user_data;
-    User *user = user_create();
+int user_controller_adapter_get_user_by_id(const struct _u_request *req, struct _u_response *res, void *user_data) {
+    GetUserByIdPort *get_user_by_id_port = (GetUserByIdPort *) user_data;
+    User *user = malloc(sizeof(User));
 
     char *id = u_map_get(req->map_url, "id");
-    user->id = atoi(id);
-    int status = user_service_get_user_by_id(app, user);
 
-    if(status == 1)
+    int rc = get_user_by_id_port->handle(get_user_by_id_port->ctx, atoi(id), user);
+
+    if(rc == 1)
         ulfius_set_json_body_response(res, 500, NULL);
-    else if(status == 2)
+    else if(rc == 2)
         ulfius_set_empty_body_response(res, 204);
     else {
         json_t *payload = json_pack("{s:i,s:s,s:i}", "id", user->id, "name", user->name, "age", user->age);
         ulfius_set_json_body_response(res, 200, payload);
     }
 
-    user_destroy(user);
+    free(user);
 
     return U_CALLBACK_COMPLETE;
 }
 
-int user_controller_post_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
-    AppContext *app = (AppContext *) user_data;
+int user_controller_adapter_post_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
+    CreateUserPort *create_user_port = (CreateUserPort *) user_data;
 
     json_error_t json_error;
     json_t *body = ulfius_get_json_body_request(req, &json_error);
@@ -69,34 +72,32 @@ int user_controller_post_user(const struct _u_request *req, struct _u_response *
     json_t *j_name = json_object_get(body, "name");
     json_t *j_age = json_object_get(body, "age");
 
-    // TODO: adicionar um validator aqui
-
     char *name = json_string_value(j_name);
     int age = (int) json_integer_value(j_age);
 
-    User *user = user_create();
+    User *user = malloc(sizeof(User));
     
     user->id = 0;
     strcpy(user->name, name);
     user->age = age;
 
-    int status = user_service_create_user(app, user);
+    int rc = create_user_port->handle(create_user_port->ctx, user);
 
-    user_destroy(user);
     json_decref(body);
 
-    if(status == 1)
+    if(rc == 1)
         ulfius_set_json_body_response(res, 500, NULL);
     else
         ulfius_set_empty_body_response(res, 201);
 
+
+    free(user);
     return U_CALLBACK_COMPLETE;
 }
 
-int user_controller_put_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
-    AppContext *app = (AppContext *) user_data;
+int user_controller_adapter_put_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
+    UpdateUserPort *update_user_port = (UpdateUserPort *) user_data;
 
-    // TODO: Implementar uma função para a conversão de json body->DTO
     json_error_t json_error;
     json_t *body = ulfius_get_json_body_request(req, &json_error);
     json_t *j_id = json_object_get(body, "id");
@@ -107,33 +108,32 @@ int user_controller_put_user(const struct _u_request *req, struct _u_response *r
     char *name = json_string_value(j_name);
     int age = (int) json_integer_value(j_age);
 
-    User *user = user_create();
+    User *user = malloc(sizeof(User));
     
     user->id = id;
     strcpy(user->name, name);
     user->age = age;
 
-    int status = user_service_update_user(app, user);
+    int rc = update_user_port->handle(update_user_port->ctx, user);
 
-    // TODO: Mapear os status para um enum
-    if(status == 1)
+    if(rc == 1)
         ulfius_set_json_body_response(res, 500, NULL);
     else
         ulfius_set_empty_body_response(res, 200);
 
-    user_destroy(user);
+    free(user);
     json_decref(body);
     
     return U_CALLBACK_COMPLETE;
 }
 
-int user_controller_delete_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
-    AppContext *app = (AppContext *) user_data;
+int user_controller_adapter_delete_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
+    DeleteUserPort *delete_user_port = (DeleteUserPort *) user_data;
     char *id = u_map_get(req->map_url, "id");
 
-    int status = user_service_delete_user(app, atoi(id));
+    int rc = delete_user_port->handle(delete_user_port->ctx, atoi(id));
 
-    if(status == 1)
+    if(rc == 1)
         ulfius_set_json_body_response(res, 500, NULL);
     else
         ulfius_set_empty_body_response(res, 200);
