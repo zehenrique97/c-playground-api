@@ -5,9 +5,8 @@ BUILDDIR := build
 OBJDIR := $(BUILDDIR)/obj
 DEPDIR := $(BUILDDIR)/dep
 
-INCLUDE = $(shell find $(INCDIR) -type d)
-
 SRC = $(shell find src -name "*.c")
+INCLUDE = $(shell find $(INCDIR) -type d)
 OBJ = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC))
 DEP = $(patsubst $(SRCDIR)/%.c,$(DEPDIR)/%.d,$(SRC))
 
