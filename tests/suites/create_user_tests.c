@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "unity.h"
+#include "user.h"
 #include "user_repo_port.h"
 #include "user_repo_port_mock.h"
 #include "create_user_tests.h"
