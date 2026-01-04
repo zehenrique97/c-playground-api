@@ -45,7 +45,9 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 -include $(DEP)
 
-tests:
+tests: build_tests run_tests
+
+build_tests:
 	@mkdir -p $(TESTSBUILDDIR)
 	$(CC) $(TFLAGS) $(TESTSSRC) -o $(TESTSBUILDDIR)/$(TESTTARGET)
 
@@ -61,4 +63,4 @@ clean_tests:
 run_tests: $(TESTSBUILDDIR)/$(TESTTARGET)
 	./$<
 
-.PHONY: all run clean tests run_tests clean_tests
+.PHONY: all run clean tests build_tests run_tests clean_tests

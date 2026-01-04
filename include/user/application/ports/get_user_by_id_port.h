@@ -2,10 +2,11 @@
 #define GET_USER_BY_ID_PORT_H
 
 #include "user.h"
+#include "user_uc_status.h"
 
 typedef struct GetUserByIdPort {
     void *ctx;
-    int (*handle)(void *ctx, int id, User *user);
+    UserUcStatus (*handle)(void *ctx, int id, User *user);
 } GetUserByIdPort;
 
 #endif

@@ -3,11 +3,12 @@
 
 #include "user.h"
 #include "user_repo_port.h"
+#include "user_uc_status.h"
 
 typedef struct GetUserByIdUc {
     UserRepoPort repo;
 } GetUserByIdUc;
 
-int get_user_by_id_uc_handle(void *ctx, int id, User *user);
+UserUcStatus get_user_by_id_uc_handle(void *ctx, int id, User *user);
 
 #endif

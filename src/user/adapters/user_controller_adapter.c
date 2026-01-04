@@ -9,17 +9,18 @@
 #include "create_user_port.h"
 #include "update_user_port.h"
 #include "delete_user_port.h"
+#include "user_uc_status.h"
 
 int user_controller_adapter_get_users(const struct _u_request *req, struct _u_response *res, void *user_data) {
     GetUsersPort *get_users_port = (GetUsersPort *) user_data;
     User *user_list;
     int number_of_users = 0;
 
-    int rc = get_users_port->handle(get_users_port->ctx, &user_list, &number_of_users);
+    UserUcStatus rc = get_users_port->handle(get_users_port->ctx, &user_list, &number_of_users);
 
-    if(rc == 1)
+    if(rc == USER_UC_ERROR)
         ulfius_set_json_body_response(res, 500, NULL);
-    else if(rc == 2)
+    else if(rc == USER_UC_NOT_FOUND)
         ulfius_set_empty_body_response(res, 204);
     else {
         json_t *root = json_object();
@@ -45,13 +46,13 @@ int user_controller_adapter_get_user_by_id(const struct _u_request *req, struct 
     GetUserByIdPort *get_user_by_id_port = (GetUserByIdPort *) user_data;
     User *user = malloc(sizeof(User));
 
-    char *id = u_map_get(req->map_url, "id");
+    const char *id = u_map_get(req->map_url, "id");
 
-    int rc = get_user_by_id_port->handle(get_user_by_id_port->ctx, atoi(id), user);
+    UserUcStatus rc = get_user_by_id_port->handle(get_user_by_id_port->ctx, atoi(id), user);
 
-    if(rc == 1)
+    if(rc == USER_UC_ERROR)
         ulfius_set_json_body_response(res, 500, NULL);
-    else if(rc == 2)
+    else if(rc == USER_UC_NOT_FOUND)
         ulfius_set_empty_body_response(res, 204);
     else {
         json_t *payload = json_pack("{s:i,s:s,s:i}", "id", user->id, "name", user->name, "age", user->age);
@@ -72,7 +73,7 @@ int user_controller_adapter_post_user(const struct _u_request *req, struct _u_re
     json_t *j_name = json_object_get(body, "name");
     json_t *j_age = json_object_get(body, "age");
 
-    char *name = json_string_value(j_name);
+    const char *name = json_string_value(j_name);
     int age = (int) json_integer_value(j_age);
 
     User *user = malloc(sizeof(User));
@@ -81,11 +82,11 @@ int user_controller_adapter_post_user(const struct _u_request *req, struct _u_re
     strcpy(user->name, name);
     user->age = age;
 
-    int rc = create_user_port->handle(create_user_port->ctx, user);
+    UserUcStatus rc = create_user_port->handle(create_user_port->ctx, user);
 
     json_decref(body);
 
-    if(rc == 1)
+    if(rc == USER_UC_ERROR)
         ulfius_set_json_body_response(res, 500, NULL);
     else
         ulfius_set_empty_body_response(res, 201);
@@ -105,7 +106,7 @@ int user_controller_adapter_put_user(const struct _u_request *req, struct _u_res
     json_t *j_age = json_object_get(body, "age");
 
     int id = (int) json_integer_value(j_id);
-    char *name = json_string_value(j_name);
+    const char *name = json_string_value(j_name);
     int age = (int) json_integer_value(j_age);
 
     User *user = malloc(sizeof(User));
@@ -114,9 +115,9 @@ int user_controller_adapter_put_user(const struct _u_request *req, struct _u_res
     strcpy(user->name, name);
     user->age = age;
 
-    int rc = update_user_port->handle(update_user_port->ctx, user);
+    UserUcStatus rc = update_user_port->handle(update_user_port->ctx, user);
 
-    if(rc == 1)
+    if(rc == USER_UC_ERROR)
         ulfius_set_json_body_response(res, 500, NULL);
     else
         ulfius_set_empty_body_response(res, 200);
@@ -129,11 +130,11 @@ int user_controller_adapter_put_user(const struct _u_request *req, struct _u_res
 
 int user_controller_adapter_delete_user(const struct _u_request *req, struct _u_response *res, void *user_data) {
     DeleteUserPort *delete_user_port = (DeleteUserPort *) user_data;
-    char *id = u_map_get(req->map_url, "id");
+    const char *id = u_map_get(req->map_url, "id");
 
-    int rc = delete_user_port->handle(delete_user_port->ctx, atoi(id));
+    UserUcStatus rc = delete_user_port->handle(delete_user_port->ctx, atoi(id));
 
-    if(rc == 1)
+    if(rc == USER_UC_ERROR)
         ulfius_set_json_body_response(res, 500, NULL);
     else
         ulfius_set_empty_body_response(res, 200);

@@ -5,13 +5,13 @@
 #include "user_pg_adapter.h"
 #include "user_repo_port.h"
 
-int user_pg_adapter_get_users(void *ctx, User **users, int *count) {
+UserRepoStatus user_pg_adapter_get_users(void *ctx, User **users, int *count) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
 
     PGresult *result = PQexec(user_pg_adapter->conn, "SELECT * FROM users;");
     if(PQresultStatus(result) != PGRES_TUPLES_OK) {
         PQclear(result);
-        return 1;
+        return USER_REPO_ERROR;
     }
 
     int num_rows = PQntuples(result);
@@ -19,13 +19,13 @@ int user_pg_adapter_get_users(void *ctx, User **users, int *count) {
         PQclear(result);
         *users = NULL;
         *count = 0;
-        return 2;
+        return USER_REPO_NOT_FOUND;
     }
 
     User *user_rows = malloc(num_rows * sizeof(User));
     if(user_rows == NULL) {
         PQclear(result);
-        return 1;
+        return USER_REPO_ERROR;
     }
 
     for (int i = 0; i < num_rows; i++) {
@@ -37,10 +37,10 @@ int user_pg_adapter_get_users(void *ctx, User **users, int *count) {
     *users = user_rows;
     *count = num_rows;
     PQclear(result);
-    return 0;
+    return USER_REPO_SUCCESS;
 }
 
-int user_pg_adapter_get_user_by_id(void *ctx, int id, User *user) {
+UserRepoStatus user_pg_adapter_get_user_by_id(void *ctx, int id, User *user) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
 
 
@@ -50,19 +50,19 @@ int user_pg_adapter_get_user_by_id(void *ctx, int id, User *user) {
     PGresult *result = PQexec(user_pg_adapter->conn, buffer);
 
     if(PQresultStatus(result) == PGRES_TUPLES_OK) {
-        if(PQntuples(result) == 0) return 2;
+        if(PQntuples(result) == 0) return USER_REPO_NOT_FOUND;
 
         user->id = atoi(PQgetvalue(result, 0, 0));
         strcpy(user->name, PQgetvalue(result, 0, 1));
         user->age = atoi(PQgetvalue(result, 0, 2));
 
-        return 0;
+        return USER_REPO_SUCCESS;
     }
 
-    return 1;
+    return USER_REPO_ERROR;
 }
 
-int user_pg_adapter_save_user(void *ctx, User *user) {
+UserRepoStatus user_pg_adapter_save_user(void *ctx, User *user) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
 
     char buffer[255];
@@ -71,12 +71,12 @@ int user_pg_adapter_save_user(void *ctx, User *user) {
     PGresult *result = PQexec(user_pg_adapter->conn, buffer);
 
     if(PQresultStatus(result) == PGRES_COMMAND_OK)
-        return 0;
+        return USER_REPO_SUCCESS;
 
-    return 1;
+    return USER_REPO_ERROR;
 }
 
-int user_pg_adapter_update_user(void *ctx, User *user) {
+UserRepoStatus user_pg_adapter_update_user(void *ctx, User *user) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
 
     char buffer[255];
@@ -85,12 +85,12 @@ int user_pg_adapter_update_user(void *ctx, User *user) {
     PGresult *result = PQexec(user_pg_adapter->conn, buffer);
 
     if(PQresultStatus(result) == PGRES_COMMAND_OK)
-        return 0;
+        return USER_REPO_SUCCESS;
 
-    return 1;
+    return USER_REPO_ERROR;
 }
 
-int user_pg_adapter_delete_user(void *ctx, int id) {
+UserRepoStatus user_pg_adapter_delete_user(void *ctx, int id) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
 
     char buffer[255];
@@ -99,7 +99,7 @@ int user_pg_adapter_delete_user(void *ctx, int id) {
     PGresult *result = PQexec(user_pg_adapter->conn, buffer);
 
     if(PQresultStatus(result) == PGRES_COMMAND_OK)
-        return 0;
+        return USER_REPO_SUCCESS;
 
-    return 1;
+    return USER_REPO_ERROR;
 }
