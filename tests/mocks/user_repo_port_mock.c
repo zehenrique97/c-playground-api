@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "user_repo_port_mock.h"
 #include "user.h"
 #include "user_repo_port.h"
@@ -11,11 +12,14 @@ UserRepoStatus get_users_mock(void *ctx, User **users, int *count) {
         *count = 0;
         return USER_REPO_NOT_FOUND;
     }
-
     if(repo->should_throw_error) return USER_REPO_ERROR;
 
-    *users = repo->returned_user_list;
     *count = sizeof(repo->returned_user_list) / sizeof(User);
+    User *user_rows = malloc(sizeof(User) * (*count));
+
+    user_rows = repo->returned_user_list;
+
+    *users = user_rows;
 
     return USER_REPO_SUCCESS;
 }
