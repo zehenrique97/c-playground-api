@@ -1,5 +1,5 @@
-#ifndef USER_PG_ADAPTER_TESTS_H
-#define USER_PG_ADAPTER_TESTS_H
+#ifndef USER_PG_ADAPTER_GET_USER_BY_ID_TESTS_H
+#define USER_PG_ADAPTER_GET_USER_BY_ID_TESTS_H
 
 #include <libpq-fe.h>
 
