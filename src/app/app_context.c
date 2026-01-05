@@ -5,9 +5,11 @@
 #define CONN_STRING "user=teste dbname=testedb password=teste123 host=localhost"
 
 int app_init(AppContext *app) {
+    printf("Connecting to DB on localhost:5432...\n");
     app->conn = PQconnectdb(CONN_STRING);
 
     if(PQstatus(app->conn) == CONNECTION_OK) {
+        printf("Connection established\n");
         app->user_pg_adapter = (UserPgAdapter){ .conn = app->conn };
 
         app->user_repo_port = (UserRepoPort){

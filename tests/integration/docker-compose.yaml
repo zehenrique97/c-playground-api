@@ -1,0 +1,9 @@
+services:
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: itest
+      POSTGRES_PASSWORD: itest123
+      POSTGRES_DB: itestdb
+    ports:
+      - "5432:5432"

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   # If you want compose to build the API as well, uncomment the following lines:
   # api:
