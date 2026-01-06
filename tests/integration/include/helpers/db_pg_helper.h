@@ -6,6 +6,8 @@
 int db_pg_init(PGconn **conn);
 int db_pg_create_table(PGconn *conn, char *schema);
 int db_pg_insert(PGconn *conn, char *table, char *parameters);
+int db_pg_delete_all(PGconn *conn, char *table);
+int db_pg_delete(PGconn *conn, char *table, int id);
 int db_pg_shutdown(PGconn *conn);
 
 #endif

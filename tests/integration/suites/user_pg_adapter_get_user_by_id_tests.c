@@ -10,6 +10,7 @@ void get_user_by_id_user_exists_return_user() {
     User expected_user = {.id = 1, .name = "User1", .age = 20};
     User *user = calloc(1, sizeof(User));
     UserPgAdapter adapter = {.conn = conn};
+
     UserRepoStatus rc = user_pg_adapter_get_user_by_id(&adapter, expected_user.id, user);
 
     TEST_ASSERT_EQUAL_INT(USER_REPO_SUCCESS, rc);
@@ -18,6 +19,16 @@ void get_user_by_id_user_exists_return_user() {
     TEST_ASSERT_EQUAL_INT(expected_user.age, user->age);
 }
 
+void get_user_by_id_user_does_not_exis_return_not_found() {
+    User *user = calloc(1, sizeof(User));
+    UserPgAdapter adapter = {.conn = conn};
+
+    UserRepoStatus rc = user_pg_adapter_get_user_by_id(&adapter, 0, user);
+
+    TEST_ASSERT_EQUAL_INT(USER_REPO_NOT_FOUND, rc);
+}
+
 void run_user_pg_adapter_get_user_by_id_tests() {
     RUN_TEST(get_user_by_id_user_exists_return_user);
+    RUN_TEST(get_user_by_id_user_does_not_exis_return_not_found);
 }

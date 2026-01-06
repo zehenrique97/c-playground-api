@@ -45,6 +45,34 @@ int db_pg_insert(PGconn *conn, char *table, char *parameters) {
     return 0;
 }
 
+int db_pg_delete_all(PGconn *conn, char *table) {
+    char buffer[500];
+    snprintf(buffer, sizeof(buffer), "DELETE FROM %s;", table);
+
+    PGresult *result = PQexec(conn, buffer);
+
+    if(PQresultStatus(result) != PGRES_COMMAND_OK) {
+        printf("Error while executing command %s\n", PQerrorMessage(conn));
+        PQclear(result);
+        return 1;
+    }
+    return 0;
+}
+
+int db_pg_delete(PGconn *conn, char *table, int id) {
+    char buffer[500];
+    snprintf(buffer, sizeof(buffer), "DELETE FROM %s WHERE id=%d;", table, id);
+
+    PGresult *result = PQexec(conn, buffer);
+
+    if(PQresultStatus(result) != PGRES_COMMAND_OK) {
+        printf("Error while executing command %s\n", PQerrorMessage(conn));
+        PQclear(result);
+        return 1;
+    }
+    return 0;
+}
+
 int db_pg_shutdown(PGconn *conn) {
     if(conn != NULL) {
         PQfinish(conn);

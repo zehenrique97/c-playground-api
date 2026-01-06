@@ -5,6 +5,6 @@
 
 extern PGconn *conn;
 
-void run_user_pg_adapter_get_user_by_id_tests(void);
+void run_user_pg_adapter_get_user_by_id_tests();
 
 #endif
