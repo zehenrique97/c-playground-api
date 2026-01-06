@@ -43,7 +43,6 @@ UserRepoStatus user_pg_adapter_get_users(void *ctx, User **users, int *count) {
 UserRepoStatus user_pg_adapter_get_user_by_id(void *ctx, int id, User *user) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
 
-
     char buffer[255];
     snprintf(buffer, sizeof(buffer), "SELECT * FROM users WHERE id=%d;", id);
 
@@ -79,6 +78,9 @@ UserRepoStatus user_pg_adapter_save_user(void *ctx, User *user) {
 UserRepoStatus user_pg_adapter_update_user(void *ctx, User *user) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
 
+    UserRepoStatus rc = user_pg_adapter_get_user_by_id(ctx, user->id, user);
+    if(rc == USER_REPO_NOT_FOUND) return rc;
+
     char buffer[255];
     snprintf(buffer, sizeof(buffer), "UPDATE users SET name='%s', age=%d WHERE id=%d;", user->name, user->age, user->id);
 
@@ -92,6 +94,11 @@ UserRepoStatus user_pg_adapter_update_user(void *ctx, User *user) {
 
 UserRepoStatus user_pg_adapter_delete_user(void *ctx, int id) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
+
+    User *user = calloc(1, sizeof(User));
+
+    UserRepoStatus rc = user_pg_adapter_get_user_by_id(ctx, id, user);
+    if(rc == USER_REPO_NOT_FOUND) return rc;
 
     char buffer[255];
     snprintf(buffer, sizeof(buffer), "DELETE FROM users WHERE id=%d;", id);

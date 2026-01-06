@@ -119,6 +119,8 @@ int user_controller_adapter_put_user(const struct _u_request *req, struct _u_res
 
     if(rc == USER_UC_ERROR)
         ulfius_set_json_body_response(res, 500, NULL);
+    else if(rc == USER_UC_NOT_FOUND)
+        ulfius_set_empty_body_response(res, 204);
     else
         ulfius_set_empty_body_response(res, 200);
 
@@ -136,6 +138,8 @@ int user_controller_adapter_delete_user(const struct _u_request *req, struct _u_
 
     if(rc == USER_UC_ERROR)
         ulfius_set_json_body_response(res, 500, NULL);
+    else if(rc == USER_UC_NOT_FOUND)
+        ulfius_set_empty_body_response(res, 204);
     else
         ulfius_set_empty_body_response(res, 200);
     
