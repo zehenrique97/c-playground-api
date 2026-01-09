@@ -3,6 +3,7 @@ SRCDIR := src
 TESTSDIR := tests/unity
 ITESTSDIR := tests/integration
 ITESTS_COMPOSE := $(ITESTSDIR)/docker-compose.yaml
+LTESTSDIR := tests/load
 INCDIR := include
 BUILDDIR := build
 OBJDIR := $(BUILDDIR)/obj
@@ -63,6 +64,9 @@ tests: build_tests run_tests
 
 itests: db_up build_itests run_itests db_down
 
+ltests:
+	@k6 run $(LTESTSDIR)/load_test.js
+
 build_tests:
 	@mkdir -p $(TESTSBUILDDIR)
 	$(CC) $(TFLAGS) $(TESTSSRC) -o $(TESTSBUILDDIR)/$(TESTTARGET)
@@ -95,4 +99,4 @@ clean_itests:
 run_itests: $(ITESTSBUILDDIR)/$(ITESTTARGET)
 	./$<
 
-.PHONY: all run clean tests build_tests run_tests clean_tests itests db_up build_itests run_itests db_down clean_itests
+.PHONY: all run clean tests build_tests run_tests clean_tests itests db_up build_itests run_itests db_down clean_itests ltests
