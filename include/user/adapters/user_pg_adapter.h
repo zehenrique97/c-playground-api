@@ -1,11 +1,11 @@
 #ifndef USER_PG_ADAPTER_H
 #define USER_PG_ADAPTER_H
 
-#include "pg_pool.h"
+#include <libpq-fe.h>
 #include "user_repo_port.h"
 
 typedef struct UserPgAdapter {
-    PgPool *pool;
+    PGconn *conn;
 } UserPgAdapter;
 
 UserRepoStatus user_pg_adapter_get_users(void *ctx, User **users, int *count);

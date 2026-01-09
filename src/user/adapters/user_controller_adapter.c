@@ -13,7 +13,7 @@
 
 int user_controller_adapter_get_users(const struct _u_request *req, struct _u_response *res, void *user_data) {
     GetUsersPort *get_users_port = (GetUsersPort *) user_data;
-    User *user_list = calloc(1, sizeof(User));
+    User *user_list;
     int number_of_users = 0;
 
     UserUcStatus rc = get_users_port->handle(get_users_port->ctx, &user_list, &number_of_users);

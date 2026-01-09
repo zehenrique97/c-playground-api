@@ -3,7 +3,7 @@
 
 typedef struct {
     int id;
-    char name[256];
+    char name[255];
     int age;
 } User;
 

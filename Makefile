@@ -33,12 +33,12 @@ ITESTSINCLUDE = $(shell find $(ITESTSINCDIR) -type d)
 
 PKG_LIBS = libulfius jansson liborcania libpq
 
-CFLAGS  = -Wall -Wextra -pthread $(addprefix -I,$(INCLUDE)) $(shell pkg-config --cflags $(PKG_LIBS)) -MMD -MP -MF
-LDLIBS  = -pthread $(shell pkg-config --libs $(PKG_LIBS))
+CFLAGS  = -Wall -Wextra $(addprefix -I,$(INCLUDE)) $(shell pkg-config --cflags $(PKG_LIBS)) -MMD -MP -MF
+LDLIBS  = $(shell pkg-config --libs $(PKG_LIBS))
 
-TFLAGS = -Wall -Wextra -pthread $(addprefix -I,$(INCLUDE)) -Itests/unity_framework $(addprefix -I,$(TESTSINCLUDE)) $(shell pkg-config --cflags --libs $(PKG_LIBS))
+TFLAGS = -Wall -Wextra $(addprefix -I,$(INCLUDE)) -Itests/unity_framework $(addprefix -I,$(TESTSINCLUDE)) $(shell pkg-config --cflags --libs $(PKG_LIBS))
 
-ITFLAGS = -Wall -Wextra -pthread $(addprefix -I,$(INCLUDE)) -Itests/unity_framework $(addprefix -I,$(ITESTSINCLUDE)) $(shell pkg-config --cflags --libs $(PKG_LIBS))
+ITFLAGS = -Wall -Wextra $(addprefix -I,$(INCLUDE)) -Itests/unity_framework $(addprefix -I,$(ITESTSINCLUDE)) $(shell pkg-config --cflags --libs $(PKG_LIBS))
 
 TARGET = lab_api
 TESTTARGET = $(addprefix tests_,$(TARGET))
