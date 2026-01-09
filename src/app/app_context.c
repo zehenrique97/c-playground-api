@@ -1,16 +1,14 @@
-#include <libpq-fe.h>
 #include <stdio.h>
 #include "app_context.h"
 
 #define CONN_STRING "user=teste dbname=testedb password=teste123 host=localhost"
+#define DB_POOL_SIZE 10
 
 int app_init(AppContext *app) {
     printf("Connecting to DB on localhost:5432...\n");
-    app->conn = PQconnectdb(CONN_STRING);
-
-    if(PQstatus(app->conn) == CONNECTION_OK) {
-        printf("Connection established\n");
-        app->user_pg_adapter = (UserPgAdapter){ .conn = app->conn };
+    if (pg_pool_init(&app->pool, CONN_STRING, DB_POOL_SIZE) == 0) {
+        printf("Connection pool established (size=%d)\n", DB_POOL_SIZE);
+        app->user_pg_adapter = (UserPgAdapter){ .pool = &app->pool };
 
         app->user_repo_port = (UserRepoPort){
             .ctx = &app->user_pg_adapter,
@@ -51,14 +49,10 @@ int app_init(AppContext *app) {
         return 0;
     }
 
-    fprintf(stderr, "Could not establish connection with database: %s\n", PQerrorMessage(app->conn));
-    PQfinish(app->conn);
+    fprintf(stderr, "Could not establish connection pool with database\n");
     return 1;
 }
 
 void app_shutdown(AppContext *app) {
-    if(app->conn != NULL) {
-        PQfinish(app->conn);
-        app->conn = NULL;
-    }
+    pg_pool_shutdown(&app->pool);
 }

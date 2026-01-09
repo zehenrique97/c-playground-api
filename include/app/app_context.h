@@ -1,7 +1,7 @@
 #ifndef APP_CONTEXT_H
 #define APP_CONTEXT_H
 
-#include <libpq-fe.h>
+#include "pg_pool.h"
 #include "get_users_port.h"
 #include "get_user_by_id_port.h"
 #include "create_user_port.h"
@@ -16,7 +16,7 @@
 #include "delete_user_uc.h"
 
 typedef struct AppContext {
-    PGconn *conn;
+    PgPool pool;
     UserPgAdapter user_pg_adapter;
     UserRepoPort user_repo_port;
     GetUsersUc get_users_uc;
