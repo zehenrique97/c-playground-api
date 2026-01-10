@@ -2,8 +2,8 @@ services:
   database:
     image: postgres:15
     environment:
-      POSTGRES_USER: itest
-      POSTGRES_PASSWORD: itest123
-      POSTGRES_DB: itestdb
+      POSTGRES_USER: teste
+      POSTGRES_PASSWORD: teste123
+      POSTGRES_DB: testedb
     ports:
       - "5432:5432"

@@ -9,7 +9,7 @@
 void get_user_by_id_user_exists_return_user() {
     User expected_user = {.id = 1, .name = "User1", .age = 20};
     User *user = calloc(1, sizeof(User));
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     UserRepoStatus rc = user_pg_adapter_get_user_by_id(&adapter, expected_user.id, user);
 
@@ -21,7 +21,7 @@ void get_user_by_id_user_exists_return_user() {
 
 void get_user_by_id_user_does_not_exis_return_not_found() {
     User *user = calloc(1, sizeof(User));
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     UserRepoStatus rc = user_pg_adapter_get_user_by_id(&adapter, 0, user);
 

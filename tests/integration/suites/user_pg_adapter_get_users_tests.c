@@ -10,7 +10,7 @@
 void get_users_users_exists_return_ok() {
     User *user_list;
     int count = 0;
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     UserRepoStatus rc = user_pg_adapter_get_users(&adapter, &user_list, &count);
 
@@ -21,7 +21,7 @@ void get_users_users_exists_return_ok() {
 void get_users_users_dont_exists_return_not_found() {
     User *user_list;
     int count = 0;
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     db_pg_delete_all(conn, "users");
     UserRepoStatus rc = user_pg_adapter_get_users(&adapter, &user_list, &count);

@@ -1,7 +1,7 @@
 #include <string.h>
 #include "db_pg_helper.h"
 
-#define CONN_STRING "user=itest dbname=itestdb password=itest123 host=localhost"
+#define CONN_STRING "user=teste dbname=testedb password=teste123 host=localhost"
 
 int db_pg_init(PGconn **conn) {
     printf("Connecting to DB on localhost:5432...\n");

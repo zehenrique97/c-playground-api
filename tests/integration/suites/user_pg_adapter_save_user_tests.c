@@ -8,7 +8,7 @@
 
 void save_user_user_inserted_return_ok() {
     User *user = calloc(1, sizeof(User));
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     UserRepoStatus rc = user_pg_adapter_save_user(&adapter, user);
 

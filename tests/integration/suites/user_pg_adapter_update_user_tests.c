@@ -9,7 +9,7 @@
 void update_user_user_updated_return_ok() {
     User expected_user = {.id = 1, .name = "User4", .age = 44};
     User *user = calloc(1, sizeof(User));
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     UserRepoStatus rc = user_pg_adapter_update_user(&adapter, &expected_user);
 
@@ -23,7 +23,7 @@ void update_user_user_updated_return_ok() {
 
 void update_user_user_does_not_exist_return_not_found() {
     User expected_user = {.id = 4, .name = "User4", .age = 44};
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     UserRepoStatus rc = user_pg_adapter_update_user(&adapter, &expected_user);
 

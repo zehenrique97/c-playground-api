@@ -7,7 +7,7 @@
 #include "user_repo_port.h"
 
 void delete_user_user_deleted_return_ok() {
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     UserRepoStatus rc = user_pg_adapter_delete_user(&adapter, 1);
 
@@ -15,7 +15,7 @@ void delete_user_user_deleted_return_ok() {
 }
 
 void delete_user_user_does_not_exist_return_not_found() {
-    UserPgAdapter adapter = {.conn = conn};
+    UserPgAdapter adapter = {.pg_pool = pg_pool};
 
     UserRepoStatus rc = user_pg_adapter_delete_user(&adapter, 4);
 
