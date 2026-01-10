@@ -4,14 +4,14 @@
 
 #define CONN_STRING "user=teste dbname=testedb password=teste123 host=localhost"
 
-int pg_pool_init(PgPool *pool, int capacity) {
+PgPoolStatus pg_pool_init(PgPool *pool, int capacity) {
     pool->capacity = capacity;
     pool->top = capacity;
 
     pool->conns = (PGconn **) calloc((size_t) capacity, sizeof(PGconn *));
     pool->free_conns_indexes = (int *) calloc((size_t) capacity, sizeof(int));
 
-    if(!pool->conns || !pool->free_conns_indexes) return 1;
+    if(!pool->conns || !pool->free_conns_indexes) return PG_POOL_ERROR;
 
     for(int i = 0; i < capacity; i++) {
         pool->conns[i] = PQconnectdb(CONN_STRING);
@@ -23,16 +23,16 @@ int pg_pool_init(PgPool *pool, int capacity) {
             free(pool->conns);
             free(pool->free_conns_indexes);
 
-            return 1;
+            return PG_POOL_ERROR;
          }
 
-        pool->free_conns_indexes = i;
+        pool->free_conns_indexes[i] = i;
     }
 
     pthread_mutex_init(&pool->mutex, NULL);
     pthread_cond_init(&pool->cond, NULL);
 
-    return 0;
+    return PG_POOL_SUCCESS;
 }
 
 void pg_pool_destroy(PgPool *pool) {
@@ -53,7 +53,7 @@ PgPoolHandler pg_pool_acquire(PgPool *pool) {
     pool->top--;
     int index = pool->free_conns_indexes[pool->top];
 
-    PgPoolHandler handler = {.pool = pool->conns[index], .pool_index = index};
+    PgPoolHandler handler = {.conn = pool->conns[index], .pool_index = index};
 
     pthread_mutex_unlock(&pool->mutex);
 

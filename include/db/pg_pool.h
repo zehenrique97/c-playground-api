@@ -14,16 +14,21 @@ typedef struct PgPool {
 } PgPool;
 
 typedef struct PgPoolHandler {
-    PgPool *pool;
+    PGconn *conn;
     int pool_index;
 } PgPoolHandler;
 
-int pg_pool_init(PgPool *pool, int capacity);
+typedef enum PgPoolStatus {
+    PG_POOL_SUCCESS,
+    PG_POOL_ERROR
+} PgPoolStatus;
+
+PgPoolStatus pg_pool_init(PgPool *pool, int capacity);
 
 void pg_pool_destroy(PgPool *pool);
 
 PgPoolHandler pg_pool_acquire(PgPool *pool);
 
-void pg_pool_release(PgPool *pool);
+void pg_pool_release(PgPool *pool, PgPoolHandler *handler);
 
 #endif

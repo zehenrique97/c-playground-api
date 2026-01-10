@@ -4,11 +4,17 @@
 #include "user.h"
 #include "user_pg_adapter.h"
 #include "user_repo_port.h"
+#include "pg_pool.h"
 
 UserRepoStatus user_pg_adapter_get_users(void *ctx, User **users, int *count) {
     UserPgAdapter *user_pg_adapter = (UserPgAdapter *) ctx;
 
-    PGresult *result = PQexec(user_pg_adapter->conn, "SELECT * FROM users;");
+    PgPoolHandler handler = pg_pool_acquire(user_pg_adapter->pg_pool);
+
+    PGresult *result = PQexec(handler.conn, "SELECT * FROM users;");
+
+    pg_pool_release(user_pg_adapter->pg_pool, &handler);
+
     if(PQresultStatus(result) != PGRES_TUPLES_OK) {
         PQclear(result);
         return USER_REPO_ERROR;
@@ -46,7 +52,11 @@ UserRepoStatus user_pg_adapter_get_user_by_id(void *ctx, int id, User *user) {
     char buffer[255];
     snprintf(buffer, sizeof(buffer), "SELECT * FROM users WHERE id=%d;", id);
 
-    PGresult *result = PQexec(user_pg_adapter->conn, buffer);
+    PgPoolHandler handler = pg_pool_acquire(user_pg_adapter->pg_pool);
+
+    PGresult *result = PQexec(handler.conn, buffer);
+
+    pg_pool_release(user_pg_adapter->pg_pool, &handler);
 
     if(PQresultStatus(result) == PGRES_TUPLES_OK) {
         if(PQntuples(result) == 0) return USER_REPO_NOT_FOUND;
@@ -67,7 +77,11 @@ UserRepoStatus user_pg_adapter_save_user(void *ctx, User *user) {
     char buffer[255];
     snprintf(buffer, sizeof(buffer), "INSERT INTO users(name, age) VALUES('%s', %d);", user->name, user->age);
 
-    PGresult *result = PQexec(user_pg_adapter->conn, buffer);
+    PgPoolHandler handler = pg_pool_acquire(user_pg_adapter->pg_pool);
+
+    PGresult *result = PQexec(handler.conn, buffer);
+
+    pg_pool_release(user_pg_adapter->pg_pool, &handler);
 
     if(PQresultStatus(result) == PGRES_COMMAND_OK)
         return USER_REPO_SUCCESS;
@@ -84,7 +98,11 @@ UserRepoStatus user_pg_adapter_update_user(void *ctx, User *user) {
     char buffer[255];
     snprintf(buffer, sizeof(buffer), "UPDATE users SET name='%s', age=%d WHERE id=%d;", user->name, user->age, user->id);
 
-    PGresult *result = PQexec(user_pg_adapter->conn, buffer);
+    PgPoolHandler handler = pg_pool_acquire(user_pg_adapter->pg_pool);
+
+    PGresult *result = PQexec(handler.conn, buffer);
+
+    pg_pool_release(user_pg_adapter->pg_pool, &handler);
 
     if(PQresultStatus(result) == PGRES_COMMAND_OK)
         return USER_REPO_SUCCESS;
@@ -103,7 +121,11 @@ UserRepoStatus user_pg_adapter_delete_user(void *ctx, int id) {
     char buffer[255];
     snprintf(buffer, sizeof(buffer), "DELETE FROM users WHERE id=%d;", id);
 
-    PGresult *result = PQexec(user_pg_adapter->conn, buffer);
+    PgPoolHandler handler = pg_pool_acquire(user_pg_adapter->pg_pool);
+
+    PGresult *result = PQexec(handler.conn, buffer);
+
+    pg_pool_release(user_pg_adapter->pg_pool, &handler);
 
     if(PQresultStatus(result) == PGRES_COMMAND_OK)
         return USER_REPO_SUCCESS;

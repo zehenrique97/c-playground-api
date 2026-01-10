@@ -1,18 +1,18 @@
-#include <libpq-fe.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "app_context.h"
-
-#define CONN_STRING "user=teste dbname=testedb password=teste123 host=localhost"
+#include "pg_pool.h"
 
 int app_init(AppContext *app) {
     printf("Connecting to DB on localhost:5432...\n");
-    app->conn = PQconnectdb(CONN_STRING);
+    app->pg_pool = malloc(sizeof(PgPool *));
 
-    if(PQstatus(app->conn) == CONNECTION_OK) {
-        printf("Connection established\n");
-        app->user_pg_adapter = (UserPgAdapter){ .conn = app->conn };
+    int pool_status = pg_pool_init(app->pg_pool, 5);
 
-        app->user_repo_port = (UserRepoPort){
+    if(pool_status == PG_POOL_SUCCESS) {
+        app->user_pg_adapter = (UserPgAdapter){ .pg_pool = app->pg_pool };
+
+        app->user_repo_port = (UserRepoPort) {
             .ctx = &app->user_pg_adapter,
             .get_users = user_pg_adapter_get_users,
             .get_user_by_id = user_pg_adapter_get_user_by_id,
@@ -51,14 +51,10 @@ int app_init(AppContext *app) {
         return 0;
     }
 
-    fprintf(stderr, "Could not establish connection with database: %s\n", PQerrorMessage(app->conn));
-    PQfinish(app->conn);
     return 1;
 }
 
 void app_shutdown(AppContext *app) {
-    if(app->conn != NULL) {
-        PQfinish(app->conn);
-        app->conn = NULL;
-    }
+    pg_pool_destroy(app->pg_pool);
+    free(app->pg_pool);
 }
