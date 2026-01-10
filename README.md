@@ -70,3 +70,6 @@ curl -X PUT http://localhost:8080/api/v1/users \
 - Unitários (Unity): `make tests`
 - Integração (PostgreSQL via Compose): `make itests`
   - O `make itests` sobe o banco definido em `tests/integration/docker-compose.yaml` na porta 5432; pare qualquer outro PostgreSQL na mesma porta antes de rodar.
+- Carga (K6): `make ltests`\*
+  - O teste de carga está configurado para testar a performance do endpoint /api/v1/users/{id} sob a carga de 1000 rps durante 5 minutos. Nessas condições, checam-se a latência p(99) e o error rate.
+  * \*Obs: Necessário executar com a API rodando em localhost:8080
